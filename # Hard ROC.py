@@ -64,9 +64,47 @@ z: float                # decision treshold
 sample_array_1 = []
 sample_array_2 = []
 
+
+def validate_numeric_list(lst):
+    if not isinstance(lst, list):  # Ensure it's a list
+        raise TypeError("Input must be a list.")
+
+    if not lst:  # Check if list is empty
+        raise ValueError("List cannot be empty.")
+
+    if not all(isinstance(item, (int, float)) for item in lst):  # Check all elements
+        raise TypeError("All elements must be either int or float.")
+
+    return True  # If all checks pass, return True (or proceed with function logic)
+
+# Example Usage
+try:
+    validate_numeric_list([1, 2.5, 3])  # Valid input
+    print("Valid list!")
+    
+    validate_numeric_list([])  # Raises ValueError
+except Exception as e:
+    print(f"Error: {e}")
+
+try:
+    validate_numeric_list([1, "hello", 3])  # Raises TypeError
+except Exception as e:
+    print(f"Error: {e}")
 # %%
 # combine as data array
 # assign array_1 with label zero, array_2 with label 1 
+
+def check_type(arr1, arr 2):
+    assert isinstance(arr1)
+
+
+def data_ar(arr_1, arr_2):
+    try:
+        data = np.array(int(arr_1) + int(arr_2))
+    except: ValueError
+        print("Input has to be integer")
+
+
 data = np.array(sample_array_1 + sample_array_2)
 labels = np.array([0] * len(sample_array_1) + [1] * len(sample_array_2))
 # Split into Train and Test Sets
@@ -74,16 +112,15 @@ data_train, data_test, labels_train, labels_test = train_test_split(
     data, labels, test_size=0.33, random_state=42
 )
 
-all_tprs: list[float]
-all_fprs: list[float]
-poiss_distr: list
+#all_tprs: list[float]
+#all_fprs: list[float]
+#poiss_distr: list
 
-true_y: list
-est_y: list
+#true_y: list
+#est_y: list
 
 # input:
-# np vector samples 1
-# np vector samples 2
+# training data, training labels
 # decision treshold z
 
 # initialize decision treshold z
@@ -92,6 +129,29 @@ est_y: list
 # calculate tp
 #   store
 # compute ROC curve (how do fp and tp increase with decreasing z?)
+
+
+def calcTPR(TP, FN):
+    TPR = TP / (TP + FN) if (TP + FN) > 0 else 0
+
+def FPR(FP, TN):
+    FP / (FP + TN) if (FP + FN) > 0 else 0
+
+
+predictprobs = np.random.poisson(4, len(data_train))
+
+class ROC_Analysis:
+    def __init__(self, data_train, labels_train):
+        self.data_train = np.array(data_train)
+        self.labels_train = np.array(labels_train)
+        self.treshold_z = []
+        self.predictsprobs = np.array(predictprobs)
+
+    def compute_rightnwrong(self):
+        # apply treshold
+
+
+
 
 
 # def plot_roc_curve(true_y, y_prob):
@@ -103,6 +163,13 @@ est_y: list
 #    plt.plot(fpr, tpr)
 #    plt.xlabel('False Positive Rate')
 #    plt.ylabel('True Positive Rate') 
+
+# compute prediction
+# prediction_probs(poisson) >= treshold 
+# if pred == 1 and true == 1, assign TP
+# if pred == 1 and true == 0, assign FP
+# if pred == 0 and true == 1, assign FN
+# if pred == 0 and true == 0, assign TN
 
 # output:
 # vector false positives fp
