@@ -17,7 +17,36 @@
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy 
+import scipy
+from sklearn.metrics import roc_curve, auc, roc_auc_score 
+from sklearn.model_selection import train_test_split
+
+# %% 
+# data
+# example distributions, check for errors (empty array, array input not string)
+samples_t1 = "Schnubbel"
+samples_t2 = "Dubbel"
+
+samples_a = np.array([])
+samples_b = np.array([0,])
+samples_c = np.array([1,])
+
+samples_d = np.array([0, 1, 1, 1, 1, 1])
+samples_e = np.array([1, 1, 1, 1, 1, 2])
+
+samples_f = np.array([1.001, 1.002, 1.003, 42000])
+samples_g = np.array([1.0021, 1.0028, 1.0029, 1.0027])
+
+samples_h = np.array([1, 1, 1, 1, 1, 1, 1, 1])
+samples_i = np.array([1, 1])
+
+samples_1: list         # original vector 1
+samples_2: list         # original vector 2
+samples_1_train: list   # training data 1
+samples_2_train: list   # training data 2
+samples_1_test: list    # testing data 1
+samples_2_test: list    # testing data 2
+z: float                # decision treshold
 
 # %%
 # a) Write a function which takes two Numpy vectors samples1 and samples2 and 
@@ -29,16 +58,25 @@ import scipy
 # do not compute histograms from the samples. The challenge for you is to 
 # rather compute the ROC curve directly from the sample vectors. 
 # Remember: Get a cafe if computing ROC is too hard!
-
 # preparation: (label if not yet done), split data into training and test data
 
-samples_1: list         # original vector 1
-samples_2: list         # original vector 2
-samples_1_train: list   # training data 1
-samples_2_train: list   # training data 2
-samples_1_test: list    # testing data 1
-samples_2_test: list    # testing data 2
-z: float                # decision treshold
+# %% 
+sample_array_1 = []
+sample_array_2 = []
+
+# %%
+# combine as data array
+# assign array_1 with label zero, array_2 with label 1 
+data = np.array(sample_array_1 + sample_array_2)
+labels = np.array([0] * len(sample_array_1) + [1] * len(sample_array_2))
+# Split into Train and Test Sets
+data_train, data_test, labels_train, labels_test = train_test_split(
+    data, labels, test_size=0.33, random_state=42
+)
+
+all_tprs: list[float]
+all_fprs: list[float]
+poiss_distr: list
 
 true_y: list
 est_y: list
@@ -54,14 +92,6 @@ est_y: list
 # calculate tp
 #   store
 # compute ROC curve (how do fp and tp increase with decreasing z?)
-
-def calc_tpr(tp, fn):
-    tpr = tp / (tp + fn)
-    return tpr
-
-def calc_fpr(fp, tn):
-    fpr = fp / (fp + tn)
-    return fpr
 
 
 # def plot_roc_curve(true_y, y_prob):
