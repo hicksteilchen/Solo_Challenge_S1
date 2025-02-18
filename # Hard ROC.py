@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 
 # %% 
 # data
-# example distributions, check for errors (empty array, array input not string)
+# example distributions, check for errors (empty array, array input not string, list same length?, arrays the same?)
 samples_t1 = "Schnubbel"
 samples_t2 = "Dubbel"
 
@@ -61,49 +61,49 @@ z: float                # decision treshold
 # preparation: (label if not yet done), split data into training and test data
 
 # %% 
-sample_array_1 = []
-sample_array_2 = []
+#sample_array_1 = []
+#sample_array_2 = []
+
+def check_input_type(inp1, inp2):
+    if not isinstance((inp1), (list, np.ndarray)) or not isinstance(inp2, (list, np.ndarray)): #or not isinstance((inp1, inp2), (np.ndarray)):
+        raise TypeError("Input is not a list or an array")
+#    elif not isinstance((inp1, inp2), (list)):  # check if list or array
+        raise TypeError("Input is not an array, please give list or array")
+    else:
+        print ("Valid input")
 
 
-def validate_numeric_list(lst):
-    if not isinstance(lst, list):  # Ensure it's a list
-        raise TypeError("Input must be a list.")
+#def validate_input(inp1, inp2):
 
-    if not lst:  # Check if list is empty
-        raise ValueError("List cannot be empty.")
+#    if not (inp1, inp2):  # check if list empty
+#        raise ValueError((f"Input {inp1} cannot be empty."), (f"Input {inp2} cannot be empty."))
 
-    if not all(isinstance(item, (int, float)) for item in lst):  # Check all elements
-        raise TypeError("All elements must be either int or float.")
+#    if not all(isinstance(item, (int, float)) for item in inp1) or not all(isinstance((item, (int, float)) for item in inp2)): # Check all elements
+#        raise TypeError("All elements must be either int or float.")
 
-    return True  # If all checks pass, return True (or proceed with function logic)
+#    if not (len(inp1) == len(inp2)):
+#        raise ValueError("Input arrays need to be the same length")
 
-# Example Usage
-try:
-    validate_numeric_list([1, 2.5, 3])  # Valid input
-    print("Valid list!")
-    
-    validate_numeric_list([])  # Raises ValueError
-except Exception as e:
-    print(f"Error: {e}")
+#    return True  # If all checks pass, return True (or proceed with function logic)
 
-try:
-    validate_numeric_list([1, "hello", 3])  # Raises TypeError
-except Exception as e:
-    print(f"Error: {e}")
+# %% 
+#type(samples_i)
+validate_input(samples_h, samples_i)
+check_input_type(samples_h, samples_i)
 # %%
 # combine as data array
 # assign array_1 with label zero, array_2 with label 1 
 
-def check_type(arr1, arr 2):
-    assert isinstance(arr1)
+# %%
 
 
 def data_ar(arr_1, arr_2):
     try:
         data = np.array(int(arr_1) + int(arr_2))
     except: ValueError
-        print("Input has to be integer")
+    print("Input has to be integer")
 
+# %% 
 
 data = np.array(sample_array_1 + sample_array_2)
 labels = np.array([0] * len(sample_array_1) + [1] * len(sample_array_2))
