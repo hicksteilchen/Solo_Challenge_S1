@@ -64,32 +64,115 @@ z: float                # decision treshold
 #sample_array_1 = []
 #sample_array_2 = []
 
-def check_input_type(inp1, inp2):
-    if not isinstance((inp1), (list, np.ndarray)) or not isinstance(inp2, (list, np.ndarray)): #or not isinstance((inp1, inp2), (np.ndarray)):
-        raise TypeError("Input is not a list or an array")
-#    elif not isinstance((inp1, inp2), (list)):  # check if list or array
-        raise TypeError("Input is not an array, please give list or array")
+def check_input_format(inp1, inp2):
+    if not isinstance(inp1, (list, tuple, np.ndarray)):
+        raise TypeError(f"Error: inp1 must be a list, tuple, or numpy array, but got {type(inp1)}")
+    
+    if not isinstance(inp2, (list, tuple, np.ndarray)):
+        raise TypeError(f"Error: inp2 must be a list, tuple, or numpy array, but got {type(inp2)}")
     else:
-        print ("Valid input")
+        print ("Valid, is list, tuple or array")
 
 
-#def validate_input(inp1, inp2):
+def check_empty(inp1, inp2):
+    if isinstance(inp1, (list, tuple, np.ndarray)) and len(inp1)== 0:
+        raise ValueError("inp1 cannot be empty.")
+    if isinstance(inp2, (list, tuple, np.ndarray)) and len(inp2) == 0:
+        raise ValueError("inp2 cannot be empty.")
+    else: print("Valid, not empty")
 
-#    if not (inp1, inp2):  # check if list empty
-#        raise ValueError((f"Input {inp1} cannot be empty."), (f"Input {inp2} cannot be empty."))
+def check_type(inp1, inp2):
+    if isinstance(inp1, np.ndarray):
+        if not np.issubdtype(inp1.dtype, np.number):  # For NumPy arrays
+            raise TypeError(f"All elements in inp1 must be numeric (int or float).")
+    else:
+        if not all(isinstance(item, (int, float, np.integer, np.floating)) for item in inp1):
+            raise TypeError(f"All elements in inp1 must be numeric (int or float).")
+    if isinstance(inp2, np.ndarray):
+        if not np.issubdtype(inp2.dtype, np.number):  # For NumPy arrays
+            raise TypeError(f"All elements in inp2 must be numeric (int or float).")
+    else:
+        if not all(isinstance(item, (int, float, np.integer, np.floating)) for item in inp2):
+            raise TypeError(f"All elements in inp2 must be numeric (int or float).")
+    print("Valid, good numbers")
 
-#    if not all(isinstance(item, (int, float)) for item in inp1) or not all(isinstance((item, (int, float)) for item in inp2)): # Check all elements
-#        raise TypeError("All elements must be either int or float.")
+def check_len(inp1, inp2):
+    if len(inp1) != len(inp2):  # Ensure same length
+        raise ValueError("Input arrays need to be the same length")
+    else:
+        print("Valid length")  # If all checks pass, return True
 
-#    if not (len(inp1) == len(inp2)):
-#        raise ValueError("Input arrays need to be the same length")
 
-#    return True  # If all checks pass, return True (or proceed with function logic)
+
+def check_pure_type(inp1, inp2):
+    """Ensure both inputs contain only integers or only floats.
+    If a list/tuple/array contains mixed types, convert all elements to floats while preserving the original format.
+    """
+
+    def get_type(lst):
+        """Returns 'int' if all elements are integers, 'float' if all are floats, and 'mixed' if both exist."""
+        has_ints = any(isinstance(item, (int, np.integer)) for item in lst)
+        has_floats = any(isinstance(item, (float, np.floating)) for item in lst)
+
+        if has_ints and has_floats:
+            return "mixed"
+        elif has_ints:
+            return "int"
+        elif has_floats:
+            return "float"
+        else:
+            return "unknown"  # If the list is empty or contains non-numeric types
+
+    def convert_to_floats(data):
+        """Convert a mixed-type list/tuple/array to all floats, preserving the original format."""
+        converted = [float(item) for item in data]
+        if isinstance(data, tuple):
+            return tuple(converted)  # Preserve tuple format
+        elif isinstance(data, np.ndarray):
+            return np.array(converted, dtype=np.float64)  # Preserve NumPy array format
+        return converted  # Default to list if input was a list
+
+    # Identify types
+    type1 = get_type(inp1)
+    type2 = get_type(inp2)
+
+    # Convert mixed lists to floats while preserving format
+    converted_inp1, converted_inp2 = inp1, inp2  # Default to original values
+    if type1 == "mixed":
+        converted_inp1 = convert_to_floats(inp1)
+        type1 = "float"  # Now all elements are floats
+        print(f"Converted inp1 to all floats: {converted_inp1}")
+
+    if type2 == "mixed":
+        converted_inp2 = convert_to_floats(inp2)
+        type2 = "float"  # Now all elements are floats
+        print(f"Converted inp2 to all floats: {converted_inp2}")
+
+    # Ensure both lists have the same type
+    if type1 != type2:
+        raise TypeError(f"Error: inp1 is of type '{type1}', but inp2 is of type '{type2}'. Both must match.")
+
+    print(f"Both inp1 and inp2 contain only {type1}s.")
+    return converted_inp1, converted_inp2  # Return modified values
+
+
+
+def validate_input(inp1, inp2):
+    check_input_format(inp1, inp2)
+    check_empty(inp1, inp2)
+    check_type(inp1, inp2) 
+    check_len(inp1, inp2)
+    check_pure_type(inp1, inp2)
+
+    print("Input check complete: Computer says yes")
 
 # %% 
-#type(samples_i)
-validate_input(samples_h, samples_i)
-check_input_type(samples_h, samples_i)
+#type(42000)
+validate_input((2,3,1,5.3,3,4), (48,23,28.43,93.3,40,53))
+#check_input_format(samples_t1, samples_b)
+#check_empty(samples_t1, samples_b)
+#check_type(samples_t1, samples_b)
+#check_len(samples_t1, samples_b)
 # %%
 # combine as data array
 # assign array_1 with label zero, array_2 with label 1 
