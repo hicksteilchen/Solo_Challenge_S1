@@ -61,6 +61,7 @@ z: float                # decision treshold
 # preparation: (label if not yet done), split data into training and test data
 
 # %% 
+# Error and excption handling
 #sample_array_1 = []
 #sample_array_2 = []
 
@@ -83,13 +84,13 @@ def check_empty(inp1, inp2):
 
 def check_type(inp1, inp2):
     if isinstance(inp1, np.ndarray):
-        if not np.issubdtype(inp1.dtype, np.number):  # For NumPy arrays
+        if not np.issubdtype(inp1.dtype, np.number):  
             raise TypeError(f"All elements in inp1 must be numeric (int or float).")
     else:
         if not all(isinstance(item, (int, float, np.integer, np.floating)) for item in inp1):
             raise TypeError(f"All elements in inp1 must be numeric (int or float).")
     if isinstance(inp2, np.ndarray):
-        if not np.issubdtype(inp2.dtype, np.number):  # For NumPy arrays
+        if not np.issubdtype(inp2.dtype, np.number): 
             raise TypeError(f"All elements in inp2 must be numeric (int or float).")
     else:
         if not all(isinstance(item, (int, float, np.integer, np.floating)) for item in inp2):
@@ -97,16 +98,17 @@ def check_type(inp1, inp2):
     print("Valid, good numbers")
 
 def check_len(inp1, inp2):
-    if len(inp1) != len(inp2):  # Ensure same length
+    if len(inp1) != len(inp2):  
         raise ValueError("Input arrays need to be the same length")
     else:
-        print("Valid length")  # If all checks pass, return True
+        print("Valid length") 
 
 
 
 def check_pure_type(inp1, inp2):
     """Ensure both inputs contain only integers or only floats.
-    If a list/tuple/array contains mixed types, convert all elements to floats while preserving the original format.
+    If either contains floats or mixed types, ask the user whether to convert all to floats.
+    If the user refuses, raise a TypeError.
     """
 
     def get_type(lst):
@@ -116,44 +118,41 @@ def check_pure_type(inp1, inp2):
 
         if has_ints and has_floats:
             return "mixed"
-        elif has_ints:
-            return "int"
         elif has_floats:
             return "float"
-        else:
-            return "unknown"  # If the list is empty or contains non-numeric types
+        elif has_ints:
+            return "int"
+        return "unknown"  # If empty or non-numeric values
 
     def convert_to_floats(data):
-        """Convert a mixed-type list/tuple/array to all floats, preserving the original format."""
+        """Convert a list/tuple/array to all floats while preserving the original format."""
         converted = [float(item) for item in data]
         if isinstance(data, tuple):
             return tuple(converted)  # Preserve tuple format
         elif isinstance(data, np.ndarray):
             return np.array(converted, dtype=np.float64)  # Preserve NumPy array format
-        return converted  # Default to list if input was a list
+        return converted  # Default to list
 
     # Identify types
     type1 = get_type(inp1)
     type2 = get_type(inp2)
 
-    # Convert mixed lists to floats while preserving format
-    converted_inp1, converted_inp2 = inp1, inp2  # Default to original values
-    if type1 == "mixed":
-        converted_inp1 = convert_to_floats(inp1)
-        type1 = "float"  # Now all elements are floats
-        print(f"Converted inp1 to all floats: {converted_inp1}")
+    # Check if conversion is needed
+    needs_conversion = "float" in (type1, type2) or "mixed" in (type1, type2) or (type1 != type2)
 
-    if type2 == "mixed":
-        converted_inp2 = convert_to_floats(inp2)
-        type2 = "float"  # Now all elements are floats
-        print(f"Converted inp2 to all floats: {converted_inp2}")
+    if needs_conversion:
+        response = input("One or both inputs contain floats or mixed types. Please check your input. Do you really want to convert all to floats? (y/n): ").strip().lower()
 
-    # Ensure both lists have the same type
-    if type1 != type2:
-        raise TypeError(f"Error: inp1 is of type '{type1}', but inp2 is of type '{type2}'. Both must match.")
+        if response == "yes":
+            inp1, inp2 = convert_to_floats(inp1), convert_to_floats(inp2)
+            print(f" Converted both inputs to floats:\n🔹 inp1: {inp1}\n🔹 inp2: {inp2}")
+        else:
+            raise TypeError(f" Type mismatch: inp1 contains '{type1}', inp2 contains '{type2}'. Cannot proceed without conversion.")
 
-    print(f"Both inp1 and inp2 contain only {type1}s.")
-    return converted_inp1, converted_inp2  # Return modified values
+    else:
+        print("Valid input. No conversion needed.")
+
+    return inp1, inp2  # Return modified values
 
 
 
@@ -173,20 +172,10 @@ validate_input((2,3,1,5.3,3,4), (48,23,28.43,93.3,40,53))
 #check_empty(samples_t1, samples_b)
 #check_type(samples_t1, samples_b)
 #check_len(samples_t1, samples_b)
+
 # %%
 # combine as data array
 # assign array_1 with label zero, array_2 with label 1 
-
-# %%
-
-
-def data_ar(arr_1, arr_2):
-    try:
-        data = np.array(int(arr_1) + int(arr_2))
-    except: ValueError
-    print("Input has to be integer")
-
-# %% 
 
 data = np.array(sample_array_1 + sample_array_2)
 labels = np.array([0] * len(sample_array_1) + [1] * len(sample_array_2))
@@ -194,6 +183,18 @@ labels = np.array([0] * len(sample_array_1) + [1] * len(sample_array_2))
 data_train, data_test, labels_train, labels_test = train_test_split(
     data, labels, test_size=0.33, random_state=42
 )
+
+# %% markdown
+
+# ROC 
+# a) Write a function which takes two Numpy vectors samples1 and samples2 and 
+# computes the ROC curve, i.e. how false positives fp(z)
+# and true positives tp(z) increase with decreasing decision threshold z 
+
+# Your function shall return two vectors fp and tp.
+# For avoiding to lose information by having to choose an arbitrary bin width,
+# do not compute histograms from the samples. The challenge for you is to 
+# rather compute the ROC curve directly from the sample vectors. 
 
 #all_tprs: list[float]
 #all_fprs: list[float]
@@ -211,8 +212,8 @@ data_train, data_test, labels_train, labels_test = train_test_split(
 #   store
 # calculate tp
 #   store
-# compute ROC curve (how do fp and tp increase with decreasing z?)
-
+# compute 
+# %%
 
 def calcTPR(TP, FN):
     TPR = TP / (TP + FN) if (TP + FN) > 0 else 0
@@ -279,11 +280,20 @@ class ROC_Analysis:
 #accuracy acc given one sample, drawn with equal likelihood from one of the two distributions. This
 #measure depends on the chosen decision threshold z.
 
+# classification accuracy (depending on z, test for different z)
+
 # %%
 # e) Apply your function to spike counts generated by two ’Poisson’ neurons firing with constant rates r1
 #and r2, respectively, over a time interval T. Show in phase space how classification accuracy with one
 #sample (acc) or two samples (auroc) depend on the firing rates. Mark the boundary where accuracy
 #surpasses 95% correct.
+
+
+# classification accuracy one sample -95% correct
+#   with different firing rates
+
+# classification accuracy two samples - 95% correct
+# with different firing rates
 
 # %% 
 # f) JUST FOR FUN: Extend your ROC function to take two additional input vectors weights1 and
