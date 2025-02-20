@@ -24,20 +24,20 @@ from sklearn.model_selection import train_test_split
 # %% 
 # data
 # example distributions, check for errors (empty array, array input not string, list same length?, arrays the same?)
-samples_t1 = "Schnubbel"
+samples_t1 = "Schnubbel"        # not strings
 samples_t2 = "Dubbel"
 
-samples_a = np.array([])
+samples_a = np.array([])                # not empty
 samples_b = np.array([0,])
 samples_c = np.array([1,])
 
-samples_d = np.array([0, 1, 1, 1, 1, 1])
+samples_d = np.array([0, 1, 1, 1, 1, 1])        # with roc, calculate variance, raise error if the same variance
 samples_e = np.array([1, 1, 1, 1, 1, 2])
 
-samples_f = np.array([1.001, 1.002, 1.003, 42000])
+samples_f = np.array([1.001, 1.002, 1.003, 42000])      # no mixed floats & ints
 samples_g = np.array([1.0021, 1.0028, 1.0029, 1.0027])
 
-samples_h = np.array([1, 1, 1, 1, 1, 1, 1, 1])
+samples_h = np.array([1, 1, 1, 1, 1, 1, 1, 1])      # same length
 samples_i = np.array([1, 1])
 
 samples_1: list         # original vector 1
@@ -166,8 +166,11 @@ def validate_input(inp1, inp2):
     print("Input check complete: Computer says yes")
 
 # %% 
-#type(42000)
-validate_input((2,3,1,5.3,3,4), (48,23,28.43,93.3,40,53))
+
+test_arr1 =  np.array([1, 2, 0.5, 1, 3, 1.8])        # with roc, calculate variance, raise error if the same variance
+test_arr2 = np.array([2, 2, 5, 1, 1, 2.3])
+
+validate_input(test_arr1, test_arr2)
 #check_input_format(samples_t1, samples_b)
 #check_empty(samples_t1, samples_b)
 #check_type(samples_t1, samples_b)
@@ -176,13 +179,17 @@ validate_input((2,3,1,5.3,3,4), (48,23,28.43,93.3,40,53))
 # %%
 # combine as data array
 # assign array_1 with label zero, array_2 with label 1 
-
-data = np.array(sample_array_1 + sample_array_2)
-labels = np.array([0] * len(sample_array_1) + [1] * len(sample_array_2))
+def split_data_labels(inp1, inp2):
+    data = np.concatenate((inp1, inp2))
+    labels = np.array([0] * len(inp1) + [1] * len(inp2))  #inp1 gets label 0, inp2 gets label 1
 # Split into Train and Test Sets
-data_train, data_test, labels_train, labels_test = train_test_split(
-    data, labels, test_size=0.33, random_state=42
-)
+    train_y, test_y, labels_train, labels_test = train_test_split(  # from sklearn.model_selection
+        data, labels, test_size=0.33, random_state=42
+        )
+    return train_y, test_y, labels_train, labels_test
+
+y_train, y_test, train_label, test_label = split_data_labels(test_arr1, test_arr2)
+print (y_train, y_test, train_label, test_label)
 
 # %% markdown
 
@@ -195,6 +202,20 @@ data_train, data_test, labels_train, labels_test = train_test_split(
 # For avoiding to lose information by having to choose an arbitrary bin width,
 # do not compute histograms from the samples. The challenge for you is to 
 # rather compute the ROC curve directly from the sample vectors. 
+
+### Plan:
+# - choose treshold (0.5?)
+
+# initialize prediction based on poisson distribution
+
+# - calculate true positives (is 1, predicts 1)
+# - calculate true negatives (is 0, predicts 0)
+# - calculate false positives (is 0, predicts 1)
+# - calculate false negatives (is 1, predicts 0)
+
+# calculate TP rate
+# calculate FP rate
+
 
 #all_tprs: list[float]
 #all_fprs: list[float]
