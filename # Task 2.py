@@ -33,6 +33,7 @@ tau = 0.010  # [s]
 r = 50e6  # [ohm]
 vrest = -0.065  # [V]
 vthr = -0.050  # [V]
+v_0 = -0.065
 dt = 1e-3  # [s]
 
 # sim with and without threshold
@@ -76,7 +77,7 @@ v_rest = -65e-3  # resting membrane potential (mV)
 v_thresh = -55e-3  # spike threshold (mV)
 v_reset = -65e-3  # reset potential (mV)
 i_e = 3e-9  # input current (nA)
-t_span = (0, .1)  # simulation time span (ms)
+t_span = 1  # simulation time span (ms)
 y0 = [v_rest]  # initial membrane potential (mV)
 
 
@@ -90,13 +91,44 @@ v = sol.y[0]
 #eventcount = sol.events
     
 
-plt.clf()
-plt.figure(figsize=(6, 4))
-plt.plot(t * 1e3, v * 1e3, label="Membrane Potential")
-plt.axhline(v_thresh * 1e3, linestyle="--", color="r", label="Threshold")
-plt.xlabel("Time (ms)")
-plt.ylabel("Membrane Potential (mV)")
-plt.title("LIF Neuron Simulation with Spike Event")
+ # spike event
+def spike(t: float, v: np.ndarray) -> float:
+    return v[0] - v_thres 
+
+spike.terminal = True  # stop if spike
+spike.direction = 1 
+
+# to store the results
+t_total = []
+v_total = []
+t_start = 0
+V_current = v_0
+spike_times = []
+
+# Continue integration after it stopped and reset 
+while t_start < t_span:
+    sol_int = sol(sim_liaf, [t_start, t_span], [V_current], events=spike)
+    
+    t_total.extend(sol.t)
+    v_total.extend(sol.y[0])
+    
+    if sol.status == 1:
+        spike_times.append(sol.t_events[0][0])
+        V_current = v_rest
+        t_start = sol.t_events[0][0] + 1e-4
+    else:
+        break  
+
+# plot
+plt.plot(t_total, v_total, label='Membrane Potential')
+plt.axhline(y=v_thres, color='r', linestyle='--', label='Threshold')
+plt.xlabel('Time (s)')
+plt.ylabel('Membrane Potential (V)')
+plt.title('LIAF with spikes')
+
+for spike_time in spike_times:
+    plt.axvline(x=spike_time, color='g', linestyle='--', label='Spike' if spike_time == spike_times[0] else "")
+
 plt.legend()
 plt.show()
 

@@ -243,7 +243,7 @@ def generate_poisson_spikes(rate, T):
 # Convert spike times to binary format
 def spikes_to_binary(spike_times, T):
     """Convert spike times to a binary representation."""
-    time_bins = np.linspace(0, T, num=int(T * 100))  # 100 bins per second
+    time_bins = np.linspace(0, T, num=int(T * 1000))  # 1000 bins per second
     binary_spikes = np.zeros(len(time_bins) - 1)
     for spike in spike_times:
         bin_index = np.digitize(spike, time_bins) - 1
