@@ -235,32 +235,6 @@ plt.tight_layout()
 plt.show()
 
 # %%
-##############################
-# Phase space plot
-# Corrected Phase Space Plot
-# plt.clf()
-# # Consistent mapping: x = neuron 1, y = neuron 2 for both groups
-# plt.figure(figsize=(7, 6))
-# plt.scatter(sample_1, sample_2[:n_trials], c='blue', label='Label 0', alpha=0.6)
-# plt.scatter(sample_1[:n_trials], sample_2, c='orange', label='Label 1', alpha=0.6)
-
-# # Plot decision boundary: y = x + optimal_threshold
-# # y = x + threshold
-# x_vals = np.linspace(0, max(max(sample_1), max(sample_2)), 100)
-# y_vals = x_vals + optimal_threshold
-# plt.plot(x_vals, y_vals, 'r--', label=f'Decision Boundary\n(score = n2 - n1 ≥ {optimal_threshold:.2f})')
-
-# # Axes & formatting
-# plt.xlabel('Neuron 1 Spike Count')
-# plt.ylabel('Neuron 2 Spike Count')
-# plt.title('Phase Space with Decision Boundary')
-# plt.legend()
-# plt.grid(True)
-# plt.axis('equal')  # optional: equal scaling
-# plt.tight_layout()
-# plt.show()
-###################################################
-# %%
 # x = np.concatenate([sample_1, sample_2])  # neuron 1
 # y = np.concatenate([sample_2, sample_1])  # neuron 2
 # colors = ['blue' if l == 0 else 'orange' for l in labels]
@@ -283,50 +257,3 @@ plt.show()
 # plt.tight_layout()
 # plt.show()
 
-# %%
-# Plot the results in phase space
-plt.figure(figsize=(12, 6))
-
-# Accuracy contour plot
-plt.subplot(1, 2, 1)
-plt.contourf(
-    x_vals,
-    y_vals,
-    accuracy_list,
-    levels=np.linspace(0, 1, 21),
-    cmap="viridis",
-    alpha=0.7,
-)
-plt.colorbar(label="Accuracy")
-plt.contour(
-    x_vals,
-    y_vals,
-    accuracy_list,
-    levels=[0.95],
-    colors="red",
-    linewidths=2,
-    linestyles="dashed",
-)
-plt.title("Classification Accuracy Phase Space")
-plt.xlabel("Firing Rate of Neuron 1 (r1)")
-plt.ylabel("Firing Rate of Neuron 2 (r2)")
-
-# AUC contour plot
-plt.subplot(1, 2, 2)
-plt.contourf(
-    x_vals,
-    y_vals,
-    auc,
-    levels=np.linspace(0, 1, 21),
-    cmap="viridis",
-    alpha=0.7,
-)
-plt.colorbar(label="AUC")
-plt.title("AUC Phase Space")
-plt.xlabel("Firing Rate of Neuron 1 (r1)")
-plt.ylabel("Firing Rate of Neuron 2 (r2)")
-
-plt.tight_layout()
-plt.show()
-
-# %%
