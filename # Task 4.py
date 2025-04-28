@@ -54,38 +54,25 @@ def power(
     f_signal = np.fft.fft(signal - signal.mean())       # fourier transformation of signal (absolute value?)
     S_spectrum = 2 * dt **2 / T * (f_signal * np.conj(f_signal)) # compute spectrum (whole signal **2)
     S_spectrum = S_spectrum[:int(len(signal) / 2)]          # ignore negative frequencies
+    #  total power in time domain
+    total_power_time = np.sum(np.abs(signal) ** 2) * dt
     
+    # total power in  frequency domain
+    total_power_freq = np.sum(S_spectrum) * df
 
     
-    return f_signal, S_spectrum, faxis
+    return f_signal, S_spectrum, faxis, total_power_freq, total_power_time
 
-f_signal, pwsig, pwaxis = power(signal, t, dt_bin)
+f_signal, pwsig, pwaxis, total_power_freq, total_power_time = power(signal, t, dt_bin)
 
+# 2. Check if Parseval's theorem is satisfied.
+print (f"with a value of total power frequeny = {total_power_freq} and total_power_time={total_power_time}, parsevals theorem is satisfyed" )
 
 plt.figure(1)
 plt.plot(pwaxis, pwsig)
 plt.xlabel('frequency')
 plt.ylabel('signal s(t)')
 plt.show()
-
-#
-
-# 2. Check if Parseval's theorem is satisfied.
-
-pw_var = np.var(pwsig)
-print (pw_var)
-
-
-wel = scipy.signal.welch(pwsig)
-meanwel = np.mean(wel)
-print(meanwel)
-
-
-#sumsig = np.sum(pwsig)
-#print (sumsig)
-#vasi = np.var(pwsig)
-#print(vasi)
-
 
 # 3. Implement a function which computes the power spectrum by averaging over the power spectra obtained from chunks of the data. Plot it in comparison to the non-averaged spectrum.
 ## - average over power spectra over part of a time series to
@@ -204,38 +191,6 @@ plt.ylabel('signal s(t)')
 plt.show()
 
 
-# %% [markdown]
-# ### Tasks
-#
-# 1. Compute and display the power spectrum of the signal, using the Fourier transform
-
-def power(
-        signal: np.ndarray, # signal
-        t: float,           # time - from signal? 
-        dt: float# time steps/sampling interval          
-):
-    N = signal.shape
-    T = t[-1]              # number of data points * sampling intervals
-
-    df = 1 / T.max()                # frequency resolution
-    nyq = 1 / dt / 2                # nyquist frequency
-    faxis = np.arange(0, nyq, df)   # frequency axis
-
-    f_signal = np.fft.fft(signal - signal.mean())       # fourier transformation of signal (absolute value?)
-    S_spectrum = 2 * dt **2 / T * (f_signal * np.conj(f_signal)) # compute spectrum (whole signal **2)
-    S_spectrum = S_spectrum[:int(len(signal) / 2)]          # ignore negative frequencies
-    
-
-    
-    return f_signal, S_spectrum, faxis
-
-f_signal, pwsig, pwaxis = power(signal, t, dt_bin)
-
-plt.figure(1)
-plt.plot(pwaxis, pwsig)
-plt.xlabel('frequency')
-plt.ylabel('signal s(t)')
-plt.show()
 # 2. Compute the wavelet transform over a convenient frequency range, and display the power or amplitude spectrum
 
 
@@ -243,59 +198,33 @@ plt.show()
 
 complex_spectrum, t_axis, freq_axis_wavelets, t_coi = wavelet_transform_morlet(signal, n_freqs, freq_min=2, freq_max= 100, dt=dt_bin, bandwidth = 1.5)
 
+# Compute the magnitude (power spectrum)
+magnitude_spectrum = np.abs(complex_spectrum) ** 2
 
-
-# Invoking the complex morlet wavelet object
-#mother = "cmor1.5-1.0"
-#mother = pywt.ContinuousWavelet('cmor1.5-1.0')
-
-#widths = mother.upper_bound - mother.lower_bound
-
-#fs = 1 / dt_bin
-
-#frequencies = np.array([100, 50, 33.33333333, 25]) / fs # normalize
-#scale = pywt.frequency2scale('cmor1.5-1.0', frequencies)
-#scale
-
-# ...applied with the parameters we want:
-#cwtmatr, freqs = pywt.cwt(
-#    pwsig, mscales, mother, dt_bin
-#)
-
-
-#cwtmatr = np.abs(cwtmatr[:-1, :-1])
-
-
-# **Revised Plotting Using imshow**
 fig, ax = plt.subplots(figsize=(10, 6))
 
-# Use imshow with proper aspect ratio and interpolation
-extent = [t[0], t[-1], f[-1], f[0]]  # Ensures correct orientation
-ax.imshow(complex_spectrum, aspect='auto', extent=extent, cmap='jet', origin='lower')
+extent = [t_axis[0], t_axis[-1], freq_axis_wavelets[-1], freq_axis_wavelets[0]] # correct extent for frequency and time axes
 
+# Plot using imshow
+img = ax.imshow(magnitude_spectrum, aspect='auto', extent=extent, cmap='jet', origin='lower')
+
+# Labels and title
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Frequency (Hz)")
 ax.set_title("Continuous Wavelet Transform (Scaleogram)")
 ax.set_yscale("log")  # Log scale for better frequency visualization
-plt.colorbar(ax.imshow(complex_spectrum, aspect='auto', extent=extent, cmap='jet', origin='lower'), ax=ax)
+
+# Colorbar
+plt.colorbar(img, ax=ax)
 
 plt.show()
-
 # %% 
 
-
-#wavelet_dsignal_show(complex_spectrum, t_axis, freq_axis_wavelets, t_coi)
-
-
-
-
 # 3. Compare the two spectra: what does the wavelet spectrum tell you what the 'normal' power spectrum can not do?
-#
+# - frequencies that only occur at speficic times, which ones at which times
+
 # 4. Add the cone-of-influence to the wavelet spectrum, and arrange the frequency axis logarithmically. Are the 'edges' of the signal with the typical artefacts from the Fourier/wavelet transforms 'wrapping around' the signal borders indeed masked by the cone? 
 #
 # 5. Try also to add some noise to the signal and observe the changes in the spectra.
 #
-
-# %%
-# YOUR CODE...
 

@@ -1,6 +1,8 @@
 # Hard ROC
 
 
+trststetsdtgrevgofdjvfs
+
 # The receiver-operator characteristics can be used to quantify how well you
 #  can distinguish samples drawn from two different probability distributions.
 # Your task is to implement the ROC analysis with your own Python code,
@@ -134,6 +136,24 @@ class DataValidator:
         self.check_type()
         print("Input check complete: Computer says yes")
 
+# apply data
+data_train, data_test, train_labels, test_labels = prepare_data(
+    neuron1_data, neuron2_data
+)
+
+# run ROC Analysis
+thresh_z = 0.5  # Decision threshold
+roc = ROCAnalysis(data_train, train_labels, thresh_z)
+
+# train the model, get predictionss
+y_pred_probs = roc.fitmodel(data_test)
+print(y_pred_probs)
+# Compute matrix
+y_pred_label, tp, fp, tn, fn = roc.comp_matrix(y_pred_probs, test_labels)
+
+# Calculate accuracy
+accuracy = roc.comp_accuracy(y_pred_label, test_labels)
+print(f"Accuracy: {accuracy:.2f}")
 # %%
 # validate, split into training and test data, add labels 
 
@@ -237,6 +257,10 @@ def spikes_to_binary(spike_times, T):
 # %% 
 
 # Generate 2 arrays filled with spike trains
+
+r1 = 30
+r2 = 50
+T = 5
 
 neuron1_data = []
 neuron2_data = []
@@ -369,3 +393,5 @@ plt.ylabel("Firing Rate of Neuron 2 (r2)")
 
 plt.tight_layout()
 plt.show()
+
+# %%

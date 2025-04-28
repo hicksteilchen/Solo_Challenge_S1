@@ -1,5 +1,7 @@
 # %%
 import numpy as np
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 
 # example distributions
 samples_t1 = "Schnubbel"
@@ -17,3 +19,5 @@ samples_g = np.array([1.0021, 1.0028, 1.0029, 1.0027])
 
 samples_h = np.array([1, 1, 1, 1, 1, 1, 1, 1])
 samples_i = np.array([1, 1])
+
+# %%
